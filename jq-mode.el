@@ -358,6 +358,15 @@
                            'after-string)))
     (jq-interactive--quit)))
 
+(defun jq-insert-last-interactive-query ()
+  "Insert the last interactive query.
+Useful when using `jq-interactively' to test out a query and then
+insert it into a script."
+  (interactive)
+  (let ((query (car-safe jq-interactive-history)))
+    (when query
+      (insert query))))
+
 (provide 'jq-mode)
 
 ;;; jq-mode.el ends here
