@@ -272,10 +272,13 @@
   (save-mark-and-excursion
    (let ((font-lock-defaults '(jq-font-lock-keywords)))
      (font-lock-fontify-region (point) (point-max))))
-  (with-current-buffer jq-interactive--buffer
-    (overlay-put jq-interactive--overlay
-                 'after-string
-                 (jq-interactive--run-command))))
+  (let ((rc (jq-interactive--run-command)))
+    (if (string= rc "null\n")
+        (message "null")
+      (with-current-buffer jq-interactive--buffer
+        (overlay-put jq-interactive--overlay
+                     'after-string
+                     rc)))))
 
 (defun jq-interactive--minibuffer-setup ()
   (setq-local font-lock-defaults '(jq-font-lock-keywords))
@@ -348,7 +351,7 @@
          (deactivate-mark)
          (read-from-minibuffer
           jq-interactive-default-prompt
-          nil
+          "."
           jq-interactive-map
           nil
           'jq-interactive-history))
