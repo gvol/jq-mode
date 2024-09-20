@@ -273,12 +273,25 @@
    (let ((font-lock-defaults '(jq-font-lock-keywords)))
      (font-lock-fontify-region (point) (point-max))))
   (let ((rc (jq-interactive--run-command)))
-    (if (string= rc "null\n")
-        (message "null")
+    (if (or (string-match "^\\(null\n\\)+$" rc)
+            (string-match "jq: error:" rc))
+        (progn
+          (overlay-put jq-interactive--overlay
+                     'face
+                     font-lock-warning-face)
+          (overlay-put jq-interactive--overlay
+                     'before-string
+                     rc))
       (with-current-buffer jq-interactive--buffer
         (overlay-put jq-interactive--overlay
-                     'after-string
-                     rc)))))
+                     'before-string
+                     nil)
+        (overlay-put jq-interactive--overlay
+                     'display
+                     rc)
+        (overlay-put jq-interactive--overlay
+                     'face
+                     font-lock-function-name-face)))))
 
 (defun jq-interactive--minibuffer-setup ()
   (setq-local font-lock-defaults '(jq-font-lock-keywords))
